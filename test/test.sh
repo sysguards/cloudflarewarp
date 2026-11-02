@@ -49,7 +49,7 @@ mv ./tempconfig ./logs-invalid-toml/config
 
 sleep 1s
 
-bash ./test-verify.sh toml $TEST_IP
+bash ./test-verify.sh toml $TEST_IP || exit 5
 
 sleep 1s
 

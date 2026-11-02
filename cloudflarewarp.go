@@ -7,7 +7,7 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/BetterCorp/cloudflarewarp/ips"
+	"github.com/sysguards/cloudflarewarp/ips"
 )
 
 const (
@@ -54,7 +54,7 @@ type CFVisitorHeader struct {
 }
 
 // New created a new plugin.
-func New(ctx context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
+func New(_ context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
 	ipOverWriter := &RealIPOverWriter{
 		next: next,
 		name: name,

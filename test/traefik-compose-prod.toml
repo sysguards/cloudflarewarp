@@ -8,12 +8,10 @@
 
 [providers.docker]
   endpoint = "unix:///var/run/docker.sock"
-  swarmMode = false
 
   exposedByDefault = false
   network = "test-instance_proxy"
   watch = true
-  swarmModeRefreshSeconds = 5
 
 [traefikLog]
   filePath = "/var/logs/traefik/traefik.log"
@@ -43,5 +41,5 @@
 [experimental]
   [experimental.plugins]
     [experimental.plugins.cloudflarewarp]
-      moduleName = "github.com/BetterCorp/cloudflarewarp"
-      version = "v1.3.0"
+      moduleName = "github.com/sysguards/cloudflarewarp"
+      version = "v1.4.0"

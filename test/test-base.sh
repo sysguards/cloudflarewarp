@@ -25,10 +25,10 @@ chmod -R 7777 ./tempconfig;
 sleep 2s;
 
 if [ "${3}" = "stack" ]; then
-  docker stack deploy -c docker-stack.yml test-instance;
+  docker stack deploy -c "${STACK_FILE:-docker-stack.yml}" test-instance;
   sleep 1s;
 else
-  docker-compose up -d;
+  docker compose up -d;
   sleep 1s;
 fi
 
@@ -47,7 +47,7 @@ while ! grep -q "Provider connection established with docker" "./logs/debug.log"
 done
 
 iterations=0
-while ! grep -q "Propagating new UP status" "./logs/debug.log" && [ $iterations -lt 30 ]; do
+while [ "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:4008/)" != "200" ] && [ $iterations -lt 30 ]; do
   sleep 1s
   echo "Waiting for Traefik to UP the service [${iterations}s/30]"
   let iterations++
@@ -62,6 +62,6 @@ if [ "${3}" = "stack" ] ; then
   sleep 1s;
 else
   sleep 1s;
-  docker-compose down;
+  docker compose down;
 fi
 

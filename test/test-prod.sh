@@ -26,14 +26,12 @@ sleep 1s
 # Get latest tag
 LATEST_PLUGIN_VERSION=$(git describe --match "v*" --abbrev=0 --tags HEAD)
 
-sed -i "s/  version = \".*/  version = \"${LATEST_PLUGIN_VERSION}\"/g" ./traefik-prod.toml
+sed -i "s/  version = \".*/  version = \"${LATEST_PLUGIN_VERSION}\"/g" ./traefik-prod.toml ./traefik-compose-prod.toml
 
 echo "Updated version of plugin to latest tag: ${LATEST_PLUGIN_VERSION}"
 
-if [ ! "${1}" = "stack" ]; then
-  mv docker-compose.yml docker-compose.yml.bak
-  cp docker-compose-prod.yml docker-compose.yml
-fi
+export COMPOSE_FILE=docker-compose-prod.yml
+export STACK_FILE=docker-stack-prod.yml
 
 sleep 1s
 
@@ -64,7 +62,7 @@ mv ./tempconfig ./logs-invalid-toml/config
 
 sleep 1s
 
-bash ./test-verify.sh toml $TEST_IP
+bash ./test-verify.sh toml $TEST_IP || exit 5
 
 sleep 1s
 
@@ -96,8 +94,3 @@ mv ./tempconfig ./logs-invalid-yml/config
 sleep 1s
 
 bash ./test-verify.sh yml $TEST_IP
-
-if [ ! "${1}" = "stack" ]; then
-  rm docker-compose.yml
-  mv docker-compose.yml.bak docker-compose.yml
-fi

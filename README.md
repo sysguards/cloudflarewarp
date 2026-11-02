@@ -1,22 +1,14 @@
-# ⚠️ Project No Longer Maintained ⚠️
-
-🚨 **This repository is no longer maintained or supported.** 🚨
-
-*We have moved to using [Caddy](https://caddyserver.com/?utm_source=github.com/BetterCorp/cloudflarewarp) for our needs.*
-
-*Thank you for your interest and support!*
-
-*If you wish to fork this project, it includes built-in testing tools. You can update the Traefik and Go versions to continue development.*
-
-
 # Real IP from Cloudflare Proxy/Tunnel
 
-[![Code Coverage](https://codecov.io/gh/BetterCorp/cloudflarewarp/branch/master/graph/badge.svg?token=QFGZS5QJSG)](https://codecov.io/gh/BetterCorp/cloudflarewarp)
-[![Code Analysis](https://github.com/BetterCorp/cloudflarewarp/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/BetterCorp/cloudflarewarp/actions/workflows/codeql-analysis.yml)
-[![Codacy Security Scan](https://github.com/BetterCorp/cloudflarewarp/actions/workflows/codacy-analysis.yml/badge.svg)](https://github.com/BetterCorp/cloudflarewarp/actions/workflows/codacy-analysis.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/BetterCorp/cloudflarewarp)](https://goreportcard.com/report/github.com/BetterCorp/cloudflarewarp)
-[![Build and Test Source](https://github.com/BetterCorp/cloudflarewarp/actions/workflows/buildAndTest.yml/badge.svg)](https://github.com/BetterCorp/cloudflarewarp/actions/workflows/buildAndTest.yml)
-[![Integration Test](https://github.com/BetterCorp/cloudflarewarp/actions/workflows/prodTest.yml/badge.svg)](https://github.com/BetterCorp/cloudflarewarp/actions/workflows/prodTest.yml)
+[![Code Coverage](https://codecov.io/gh/sysguards/cloudflarewarp/branch/master/graph/badge.svg)](https://codecov.io/gh/sysguards/cloudflarewarp)
+[![Code Analysis](https://github.com/sysguards/cloudflarewarp/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/sysguards/cloudflarewarp/actions/workflows/codeql-analysis.yml)
+[![Codacy Security Scan](https://github.com/sysguards/cloudflarewarp/actions/workflows/codacy-analysis.yml/badge.svg)](https://github.com/sysguards/cloudflarewarp/actions/workflows/codacy-analysis.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/sysguards/cloudflarewarp)](https://goreportcard.com/report/github.com/sysguards/cloudflarewarp)
+[![Build and Test Source](https://github.com/sysguards/cloudflarewarp/actions/workflows/buildAndTest.yml/badge.svg)](https://github.com/sysguards/cloudflarewarp/actions/workflows/buildAndTest.yml)
+[![Integration Test](https://github.com/sysguards/cloudflarewarp/actions/workflows/prodTest.yml/badge.svg)](https://github.com/sysguards/cloudflarewarp/actions/workflows/prodTest.yml)
+
+This is the maintained fork of [BetterCorp/cloudflarewarp](https://github.com/BetterCorp/cloudflarewarp), which is archived.  
+To migrate, change `moduleName` to `github.com/sysguards/cloudflarewarp` and set `version` as shown in [Enable the plugin](#enable-the-plugin). The plugin configuration does not change.
 
 If Traefik is behind a Cloudflare Proxy/Tunnel, it won't be able to get the real IP from the external client as well as other information.
 
@@ -48,7 +40,7 @@ If you do not define `trustip` and `disableDefault`, it doesn't seem to load the
 experimental:
   plugins:
     cloudflarewarp:
-      moduleName: github.com/BetterCorp/cloudflarewarp
+      moduleName: github.com/sysguards/cloudflarewarp
       version: v1.4.0
 ```
 
@@ -82,7 +74,7 @@ http:
 
 # Testing
 
-[https://github.com/BetterCorp/cloudflarewarp/tree/master/test](https://github.com/BetterCorp/cloudflarewarp/tree/master/test)
+[https://github.com/sysguards/cloudflarewarp/tree/master/test](https://github.com/sysguards/cloudflarewarp/tree/master/test)
 
 We have written the following tests in this repo:
 
@@ -96,4 +88,4 @@ These tests allow us to make sure the plugin is always functional with Traefik a
 
 # Standing up the crowdsec bouncer plugin in traefik
 
-See the following blog post for a walkthrough on how to stand up the crowdsec bouncer plugin in traefik: [https://bpto.li/H0JY11Zb](https://bpto.li/H0JY11Zb)
+See the following blog post for a walkthrough on how to stand up the crowdsec bouncer plugin in traefik: [Standing up the crowdsec bouncer plugin in traefik](https://www.reddit.com/r/selfhosted/comments/1dcn19v/standing_up_the_crowdsec_bouncer_plugin_in_traefik/)
