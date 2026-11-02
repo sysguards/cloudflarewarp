@@ -52,7 +52,7 @@ experimental:
   plugins:
     cloudflarewarp:
       moduleName: github.com/sysguards/cloudflarewarp
-      version: v1.4.0
+      version: v1.4.1
 ```
 
 ### Plugin configuration
