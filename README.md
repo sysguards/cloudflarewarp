@@ -10,6 +10,8 @@
 This is the maintained fork of [BetterCorp/cloudflarewarp](https://github.com/BetterCorp/cloudflarewarp), which is archived.  
 To migrate, change `moduleName` to `github.com/sysguards/cloudflarewarp` and set `version` as shown in [Enable the plugin](#enable-the-plugin). The plugin configuration does not change.
 
+**Behavior change:** `disableDefault: true` was silently ignored by the original plugin, the built-in CloudFlare IPs stayed trusted. It now disables them as documented, so if you set it, make sure `trustip` lists every range you want to trust.
+
 If Traefik is behind a Cloudflare Proxy/Tunnel, it won't be able to get the real IP from the external client as well as other information.
 
 This plugin solves this issue by overwriting the X-Real-IP and X-Forwarded-For with an IP from the CF-Connecting-IP header.  

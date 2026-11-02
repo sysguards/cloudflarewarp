@@ -1,6 +1,7 @@
 #!/bin/sh
 
 TEST_IP="187.2.2.1"
+FAIL_COMPOSE_FILE="docker-compose.yml:docker-compose-cloudflare-net.yml"
 
 rm -rf ./logs-success
 rm -rf ./logs-success-toml
@@ -31,7 +32,7 @@ mv ./tempconfig ./logs-success-toml/config
 
 sleep 1s
 
-bash test-base.sh fail toml "${1}" $TEST_IP
+COMPOSE_FILE="$FAIL_COMPOSE_FILE" bash test-base.sh fail toml "${1}" $TEST_IP
 
 sleep 1s
 
@@ -49,7 +50,7 @@ mv ./tempconfig ./logs-invalid-toml/config
 
 sleep 1s
 
-bash ./test-verify.sh toml $TEST_IP || exit 5
+bash ./test-verify.sh toml $TEST_IP "${1}" || exit 5
 
 sleep 1s
 
@@ -62,7 +63,7 @@ mv ./tempconfig ./logs-success-yml/config
 
 sleep 1s
 
-bash test-base.sh fail yml "${1}" $TEST_IP
+COMPOSE_FILE="$FAIL_COMPOSE_FILE" bash test-base.sh fail yml "${1}" $TEST_IP
 
 sleep 1s
 
@@ -80,4 +81,4 @@ mv ./tempconfig ./logs-invalid-yml/config
 
 sleep 1s
 
-bash ./test-verify.sh yml $TEST_IP
+bash ./test-verify.sh yml $TEST_IP "${1}"

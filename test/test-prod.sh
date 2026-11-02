@@ -32,6 +32,7 @@ echo "Updated version of plugin to latest tag: ${LATEST_PLUGIN_VERSION}"
 
 export COMPOSE_FILE=docker-compose-prod.yml
 export STACK_FILE=docker-stack-prod.yml
+FAIL_COMPOSE_FILE="${COMPOSE_FILE}:docker-compose-cloudflare-net.yml"
 
 sleep 1s
 
@@ -44,7 +45,7 @@ mv ./tempconfig ./logs-success-toml/config
 
 sleep 1s
 
-bash test-base.sh fail toml "${1}" $TEST_IP
+COMPOSE_FILE="$FAIL_COMPOSE_FILE" bash test-base.sh fail toml "${1}" $TEST_IP
 
 sleep 1s
 
@@ -62,7 +63,7 @@ mv ./tempconfig ./logs-invalid-toml/config
 
 sleep 1s
 
-bash ./test-verify.sh toml $TEST_IP || exit 5
+bash ./test-verify.sh toml $TEST_IP "${1}" || exit 5
 
 sleep 1s
 
@@ -75,7 +76,7 @@ mv ./tempconfig ./logs-success-yml/config
 
 sleep 1s
 
-bash test-base.sh fail yml "${1}" $TEST_IP
+COMPOSE_FILE="$FAIL_COMPOSE_FILE" bash test-base.sh fail yml "${1}" $TEST_IP
 
 sleep 1s
 
@@ -93,4 +94,4 @@ mv ./tempconfig ./logs-invalid-yml/config
 
 sleep 1s
 
-bash ./test-verify.sh yml $TEST_IP
+bash ./test-verify.sh yml $TEST_IP "${1}"

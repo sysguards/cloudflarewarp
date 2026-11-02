@@ -30,6 +30,11 @@ if ! grep -q "X-Is-Trusted: no" $FAIL_CONFIG_FILE; then
   echo "'X-Is-Trusted: no' header was not added to the invalid request ($FAIL_CONFIG_FILE)"
   exit 5
 fi
+# disableDefault only shows from a source IP inside a Cloudflare range, which the routing mesh of stack mode rules out
+if [ ! "${3}" = "stack" ] && ! grep -q "X-Real-Ip: 103.21.244." $FAIL_CONFIG_FILE; then
+  echo "The request did not come from a Cloudflare IP, disableDefault was not tested ($FAIL_CONFIG_FILE)"
+  exit 5
+fi
 if ! grep -q "X-Is-Trusted: no" $INVALID_CONFIG_FILE; then
   echo "'X-Is-Trusted: no' header was not added to the invalid request ($INVALID_CONFIG_FILE)"
   exit 5

@@ -20,9 +20,10 @@ const (
 )
 
 // Config the plugin configuration.
+// Traefik decodes it with mapstructure, which ignores json tags: field names must match the configuration keys.
 type Config struct {
-	TrustIP             []string `json:"trustip,omitempty"`
-	DisableDefaultCFIPs bool     `json:"disableDefault,omitempty"`
+	TrustIP        []string `json:"trustip,omitempty"`
+	DisableDefault bool     `json:"disableDefault,omitempty"`
 }
 
 // TrustResult for Trust IP test result.
@@ -36,8 +37,8 @@ type TrustResult struct {
 // CreateConfig creates the default plugin configuration.
 func CreateConfig() *Config {
 	return &Config{
-		TrustIP:             []string{},
-		DisableDefaultCFIPs: false,
+		TrustIP:        []string{},
+		DisableDefault: false,
 	}
 }
 
@@ -71,7 +72,7 @@ func New(_ context.Context, next http.Handler, config *Config, name string) (htt
 		}
 	}
 
-	if !config.DisableDefaultCFIPs {
+	if !config.DisableDefault {
 		for _, v := range ips.CFIPs() {
 			_, trustip, err := net.ParseCIDR(v)
 			if err != nil {

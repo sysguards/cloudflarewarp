@@ -1,0 +1,6 @@
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 103.21.244.0/24
+          gateway: 103.21.244.1

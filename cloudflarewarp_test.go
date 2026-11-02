@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
+	"strings"
 	"testing"
 
 	plugin "github.com/sysguards/cloudflarewarp"
@@ -176,6 +178,19 @@ func TestError(t *testing.T) {
 	_, err := plugin.New(ctx, next, cfg, "cloudflarewarp")
 	if err == nil {
 		t.Fatalf("expected error, got none")
+	}
+}
+
+func TestConfigKeysMatchFieldNames(t *testing.T) {
+	configType := reflect.TypeOf(*plugin.CreateConfig())
+
+	for _, key := range []string{"trustip", "disableDefault"} {
+		_, found := configType.FieldByNameFunc(func(name string) bool {
+			return strings.EqualFold(name, key)
+		})
+		if !found {
+			t.Errorf("no Config field matches the configuration key %s, Traefik would ignore it", key)
+		}
 	}
 }
 
