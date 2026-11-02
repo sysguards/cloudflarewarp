@@ -25,6 +25,10 @@ if ! grep -q "Cf-Visitor: {\"scheme\":\"https\"}" $SUCCESS_CONFIG_FILE; then
   echo "'Cf-Visitor: {\"scheme\":\"https\"}' header not defined ($SUCCESS_CONFIG_FILE)"
   exit 5
 fi
+if ! grep -q "cloudflarewarp: IP list updated" "./logs-success-${1}/debug.log"; then
+  echo "The Cloudflare IP list was not downloaded (./logs-success-${1}/debug.log)"
+  exit 5
+fi
 
 if ! grep -q "X-Is-Trusted: no" $FAIL_CONFIG_FILE; then
   echo "'X-Is-Trusted: no' header was not added to the invalid request ($FAIL_CONFIG_FILE)"

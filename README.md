@@ -24,10 +24,11 @@ The plugin also writes the CF-Visitor scheme to the X-Forwarded-Proto. (This fix
 
 Supported configurations per body
 
-| Setting        | Allowed values | Required | Description                                         |
-| :------------- | :------------- | :------- | :-------------------------------------------------- |
-| trustip        | []string       | No       | IP or IP range to trust                             |
-| disableDefault | bool           | Yes      | Disable the built in list of CloudFlare IPs/Servers |
+| Setting        | Allowed values | Required | Description                                                                |
+| :------------- | :------------- | :------- | :------------------------------------------------------------------------- |
+| trustip        | []string       | No       | IP or IP range to trust                                                    |
+| disableDefault | bool           | Yes      | Disable the built in list of CloudFlare IPs/Servers                        |
+| autoUpdateIPs  | bool           | No       | Download the CloudFlare IPs from the CloudFlare API (`false` by default)   |
 
 ### Notes re CloudFlare
 
@@ -35,6 +36,14 @@ One thing included in this plugin is we bundle the CloudFlare server IPs with it
 However on the flip-side, if you want to, you can just disable them by setting `disableDefault` to `true`.
 
 If you do not define `trustip` and `disableDefault`, it doesn't seem to load the plugin, so just set `disableDefault` to `false` and you are able to use the default IP list.
+
+### Keeping the CloudFlare IPs up to date
+
+The bundled list only changes with a new plugin version. Set `autoUpdateIPs` to `true` to download it from `https://api.cloudflare.com/client/v4/ips` instead, when Traefik starts and then every 24 hours. Traefik needs outbound HTTPS access to that address.
+
+The plugin starts with the bundled list and never delays Traefik: the downloaded list replaces it once it has been received and validated. If the download fails, the plugin keeps the current list, logs an error and tries again one hour later. After a restart, the bundled list applies until the first successful download.
+
+This option has no effect when `disableDefault` is `true`.
 
 ### Enable the plugin
 

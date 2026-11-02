@@ -181,10 +181,47 @@ func TestError(t *testing.T) {
 	}
 }
 
+func TestAutoUpdateIPs(t *testing.T) {
+	testCases := []struct {
+		desc           string
+		disableDefault bool
+		expected       string
+	}{
+		{desc: "embedded list applies right away, whether the download works or not", expected: "yes"},
+		{desc: "disableDefault wins", disableDefault: true, expected: "no"},
+	}
+
+	for _, test := range testCases {
+		t.Run(test.desc, func(t *testing.T) {
+			cfg := plugin.CreateConfig()
+			cfg.AutoUpdateIPs = true
+			cfg.DisableDefault = test.disableDefault
+
+			ctx := context.Background()
+			next := http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {})
+			handler, err := plugin.New(ctx, next, cfg, "cloudflarewarp")
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://localhost", nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			req.RemoteAddr = "103.21.244.23:36001"
+			req.Header.Set("Cf-Connecting-IP", "10.0.0.1")
+
+			handler.ServeHTTP(httptest.NewRecorder(), req)
+
+			assertHeader(t, req, "X-Is-Trusted", test.expected)
+		})
+	}
+}
+
 func TestConfigKeysMatchFieldNames(t *testing.T) {
 	configType := reflect.TypeOf(*plugin.CreateConfig())
 
-	for _, key := range []string{"trustip", "disableDefault"} {
+	for _, key := range []string{"trustip", "disableDefault", "autoUpdateIPs"} {
 		_, found := configType.FieldByNameFunc(func(name string) bool {
 			return strings.EqualFold(name, key)
 		})

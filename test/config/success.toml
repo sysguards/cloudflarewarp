@@ -4,6 +4,7 @@
     [http.middlewares.cloudflarewarp]
       [http.middlewares.cloudflarewarp.plugin]
         [http.middlewares.cloudflarewarp.plugin.cloudflarewarp]
+          autoUpdateIPs=true
           trustip=[
             "10.0.0.0/8", 
             "172.0.0.0/8",

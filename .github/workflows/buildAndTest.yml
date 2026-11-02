@@ -36,7 +36,7 @@ jobs:
           fetch-depth: 0
 
       - name: Build Cloudflare IPs
-        run: bash updateCFIps.sh
+        run: bash updateCFIps.sh ci
 
       - name: Setup GOPATH
         run: go env -w GOPATH=${{ github.workspace }}/go
@@ -62,7 +62,9 @@ jobs:
           CGO_ENABLED: 1
 
       - name: Run tests with Yaegi
-        run: ${{ github.workspace }}/go/bin/yaegi test .
+        run: |
+          ${{ github.workspace }}/go/bin/yaegi test .
+          cd ips && ${{ github.workspace }}/go/bin/yaegi test .
 
       - uses: codecov/codecov-action@v7
         with:

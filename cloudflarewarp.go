@@ -24,6 +24,7 @@ const (
 type Config struct {
 	TrustIP        []string `json:"trustip,omitempty"`
 	DisableDefault bool     `json:"disableDefault,omitempty"`
+	AutoUpdateIPs  bool     `json:"autoUpdateIPs,omitempty"`
 }
 
 // TrustResult for Trust IP test result.
@@ -39,14 +40,16 @@ func CreateConfig() *Config {
 	return &Config{
 		TrustIP:        []string{},
 		DisableDefault: false,
+		AutoUpdateIPs:  false,
 	}
 }
 
 // RealIPOverWriter is a plugin that overwrite true IP.
 type RealIPOverWriter struct {
-	next    http.Handler
-	name    string
-	TrustIP []*net.IPNet
+	next       http.Handler
+	name       string
+	TrustIP    []*net.IPNet
+	cloudflare *ips.Store
 }
 
 // CFVisitorHeader definition for the header value.
@@ -72,15 +75,28 @@ func New(_ context.Context, next http.Handler, config *Config, name string) (htt
 		}
 	}
 
-	if !config.DisableDefault {
-		for _, v := range ips.CFIPs() {
-			_, trustip, err := net.ParseCIDR(v)
-			if err != nil {
-				return nil, err
-			}
+	if config.DisableDefault {
+		return ipOverWriter, nil
+	}
 
-			ipOverWriter.TrustIP = append(ipOverWriter.TrustIP, trustip)
+	if config.AutoUpdateIPs {
+		cloudflare, err := ips.Shared()
+		if err != nil {
+			return nil, err
 		}
+
+		ipOverWriter.cloudflare = cloudflare
+
+		return ipOverWriter, nil
+	}
+
+	for _, v := range ips.CFIPs() {
+		_, trustip, err := net.ParseCIDR(v)
+		if err != nil {
+			return nil, err
+		}
+
+		ipOverWriter.TrustIP = append(ipOverWriter.TrustIP, trustip)
 	}
 
 	return ipOverWriter, nil
@@ -148,20 +164,19 @@ func (r *RealIPOverWriter) trust(s string) *TrustResult {
 			directIP: "",
 		}
 	}
-	for _, network := range r.TrustIP {
-		if network.Contains(ip) {
-			return &TrustResult{
-				isFatal:  false,
-				isError:  false,
-				trusted:  true,
-				directIP: ip.String(),
-			}
-		}
-	}
 	return &TrustResult{
 		isFatal:  false,
 		isError:  false,
-		trusted:  false,
+		trusted:  r.isTrusted(ip),
 		directIP: ip.String(),
 	}
+}
+
+func (r *RealIPOverWriter) isTrusted(ip net.IP) bool {
+	for _, network := range r.TrustIP {
+		if network.Contains(ip) {
+			return true
+		}
+	}
+	return r.cloudflare != nil && r.cloudflare.Contains(ip)
 }
