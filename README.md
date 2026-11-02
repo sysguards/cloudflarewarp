@@ -12,6 +12,13 @@ To migrate, change `moduleName` to `github.com/sysguards/cloudflarewarp` and set
 
 **Behavior change:** `disableDefault: true` was silently ignored by the original plugin, the built-in CloudFlare IPs stayed trusted. It now disables them as documented, so if you set it, make sure `trustip` lists every range you want to trust.
 
+**Behavior change:** for a trusted request, the plugin now replaces the source address of the request with the client IP.
+
+- `X-Forwarded-For` reaches your application with the client IP alone, instead of being followed by the CloudFlare IP.
+- Traefik middlewares that run after this plugin see the client IP. An `ipAllowList` placed after it must list client ranges: if it only allows CloudFlare ranges, every request is now refused.
+- A trusted request with a malformed `CF-Connecting-IP` is forwarded with `X-Is-Trusted: danger`, without its CloudFlare headers.
+- `ClientHost` in the Traefik access log keeps the CloudFlare IP. To log the client, use the `json` format and keep the `X-Real-Ip` header.
+
 If Traefik is behind a Cloudflare Proxy/Tunnel, it won't be able to get the real IP from the external client as well as other information.
 
 This plugin solves this issue by overwriting the X-Real-IP and X-Forwarded-For with an IP from the CF-Connecting-IP header.  

@@ -122,20 +122,11 @@ func (r *RealIPOverWriter) ServeHTTP(rw http.ResponseWriter, req *http.Request) 
 		return
 	}
 	if trustResult.trusted {
-		if req.Header.Get(cfVisitor) != "" {
-			var cfVisitorValue CFVisitorHeader
-			if err := json.Unmarshal([]byte(req.Header.Get(cfVisitor)), &cfVisitorValue); err != nil {
-				req.Header.Set(xCfTrusted, "danger")
-				req.Header.Del(cfVisitor)
-				req.Header.Del(cfConnectingIP)
-				r.next.ServeHTTP(rw, req)
-				return
-			}
-			req.Header.Set(xForwardProto, cfVisitorValue.Scheme)
+		if !applyCloudflareHeaders(req) {
+			req.Header.Set(xCfTrusted, "danger")
+			req.Header.Del(cfVisitor)
+			req.Header.Del(cfConnectingIP)
 		}
-		req.Header.Set(xCfTrusted, "yes")
-		req.Header.Set(xForwardFor, req.Header.Get(cfConnectingIP))
-		req.Header.Set(xRealIP, req.Header.Get(cfConnectingIP))
 	} else {
 		req.Header.Set(xCfTrusted, "no")
 		req.Header.Set(xRealIP, trustResult.directIP)
@@ -143,6 +134,37 @@ func (r *RealIPOverWriter) ServeHTTP(rw http.ResponseWriter, req *http.Request) 
 		req.Header.Del(cfConnectingIP)
 	}
 	r.next.ServeHTTP(rw, req)
+}
+
+func applyCloudflareHeaders(req *http.Request) bool {
+	clientIP := net.ParseIP(req.Header.Get(cfConnectingIP))
+	if clientIP == nil {
+		return false
+	}
+
+	if req.Header.Get(cfVisitor) != "" {
+		var cfVisitorValue CFVisitorHeader
+		if err := json.Unmarshal([]byte(req.Header.Get(cfVisitor)), &cfVisitorValue); err != nil {
+			return false
+		}
+
+		req.Header.Set(xForwardProto, cfVisitorValue.Scheme)
+	}
+
+	req.Header.Set(xCfTrusted, "yes")
+	setClientIP(req, clientIP)
+
+	return true
+}
+
+// setClientIP makes the client the source of the request. Traefik appends RemoteAddr to X-Forwarded-For
+// after the middlewares, so the header is removed here: writing it would leave the Cloudflare IP behind it.
+func setClientIP(req *http.Request, clientIP net.IP) {
+	_, port, _ := net.SplitHostPort(req.RemoteAddr)
+
+	req.Header.Del(xForwardFor)
+	req.Header.Set(xRealIP, clientIP.String())
+	req.RemoteAddr = net.JoinHostPort(clientIP.String(), port)
 }
 
 func (r *RealIPOverWriter) trust(s string) *TrustResult {

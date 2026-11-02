@@ -13,8 +13,8 @@ if ! grep -q "X-Is-Trusted: yes" $SUCCESS_CONFIG_FILE; then
   echo "'X-Is-Trusted: yes' header was not added and parsed ($SUCCESS_CONFIG_FILE)"
   exit 5
 fi
-if ! grep -q "X-Forwarded-For: ${2}" $SUCCESS_CONFIG_FILE; then
-  echo "'X-Forwarded-For: ${2}' header not defined ($SUCCESS_CONFIG_FILE)"
+if ! grep -qE "^X-Forwarded-For: ${2}[[:space:]]*$" $SUCCESS_CONFIG_FILE; then
+  echo "'X-Forwarded-For: ${2}' header not defined, or not alone ($SUCCESS_CONFIG_FILE)"
   exit 5
 fi
 #if ! grep -q "X-Real-Ip: 10.0.0.2" $SUCCESS_CONFIG_FILE; then
